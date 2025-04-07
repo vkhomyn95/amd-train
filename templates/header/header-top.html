@@ -1,0 +1,46 @@
+<div class="top-panel">
+    <div class="top-panel-wrapper">
+      <div class="top-panel-logo">
+          {% include 'header/icons/icon-voiptime.html' %}
+      </div>
+      <div class="top-panel-user">
+        <div class="top-panel-user-navigation position-relative">
+            <div onclick="toggleUserMenu()">
+                 {% include 'header/icons/icon-user.html' %}
+            </div>
+
+            <div class="top-panel-user-menu absolute flex flex-direction-column flex-content-around" style="display: none">
+
+              <div class="mb-10">
+                <a class="top-panel-user-menu-li flex flex-align-center" href="{{ url_for('user_profile') }}">
+                    {% include 'header/icons/icon-profile.html' %}
+                  <span class="top-panel-user-menu-li-title">{{ current_user.first_name }} {{ current_user.last_name }}</span>
+                </a>
+              </div>
+
+              <div>
+                <a class="top-panel-user-menu-li flex flex-align-center" href="{{ url_for('logout') }}">
+                    {% include 'header/icons/icon-logout.html' %}
+                  <span class="top-panel-user-menu-li-title">Вихід з системи</span>
+                </a>
+              </div>
+            </div>
+        </div>
+      </div>
+    </div>
+</div>
+<script>
+let isOpenUserMenu = false;
+function toggleUserMenu() {
+  let menu = document.querySelector('.top-panel-user-menu');
+
+  // Toggle the 'open' class to change the appearance of the menu button
+  if (isOpenUserMenu) {
+      menu.style.display = 'none';
+      isOpenUserMenu = false;
+  } else {
+      menu.style.display = 'block';
+      isOpenUserMenu = true;
+  }
+}
+</script>

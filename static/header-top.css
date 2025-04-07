@@ -1,0 +1,120 @@
+.top-panel {
+  width: 100%;
+  height: 60px;
+  padding: 10px;
+  background-color: #00546a;
+  display: flex;
+}
+.top-panel-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+.top-panel-logo {
+  height: 35px;
+  width: 150px;
+  background-color: #00546a;
+}
+.top-panel-logo-svg {
+  height: 35px;
+  color: #ffffff;
+  width: 100%;
+}
+.top-panel-user {
+  display: flex;
+  gap: 10px;
+  height: 40px;
+}
+.top-panel-user-svg {
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+}
+.top-panel-user-name {
+  white-space: nowrap;
+  overflow: hidden;
+  margin-left: 50px;
+}
+.top-panel-user-menu {
+  background-color: #00657f;
+  border-radius: 5px;
+  width: 228px;
+  z-index: 4;
+  right: 10px;
+  margin-top: 5px;
+  padding: 15px;
+}
+.top-panel-user-menu-li {
+  padding: 10px 15px;
+  text-decoration: none;
+}
+.top-panel-user-menu-li:hover {
+  background: #00546A;
+  color: #ffbd3e!important;
+}
+.top-panel-user-menu-li:hover .top-panel-user-menu-li-title{
+  color: #ffbd3e;
+}
+.top-panel-user-menu-li:hover .top-panel-user-menu-li-svg {
+  color: #ffbd3e;
+}
+.top-panel-user-menu-li-main-title {
+  color:#ffffff;
+  font-size: 14px;
+  font-weight: 400;
+  font-family: Roboto, sans-serif;
+}
+.top-panel-user-menu-li-svg {
+  height: 24px;
+  width: 24px;
+  cursor: pointer;
+  margin-right: 10px;
+  color: white;
+}
+.top-panel-user-menu-li-title {
+  font-size: 15px;
+  font-weight: 400;
+  font-family: Roboto, sans-serif;
+  color: #ffffff;
+  cursor: pointer;
+  line-height: 17px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.select__dropdown {
+  width: 165px;
+}
+.select__dropdown-selected {
+  height: 100%;
+  background-color: #00546a;
+  border: 1px solid #6bb0c2;
+  font-size: 13px;
+  font-weight: 400;
+  border-radius: 50px;
+}
+.select__dropdown-selected svg {
+  filter: invert(98%) sepia(16%) saturate(14%) hue-rotate(94deg) brightness(103%) contrast(90%);
+}
+.select__dropdown-value {
+  color: #ffffff;
+}
+.select__dropdown-options {
+  border-radius: 8px;
+  height: max-content;
+  scrollbar-width: none;
+}
+.slide-fade-enter-active {
+  transition: all 0.1s ease-in-out;
+  opacity: 0.7;
+}
+.slide-fade-leave-active {
+  transition: all 0.8s cubic-bezier(1, 0.5, 0.8, 1);
+}
+.slide-fade-enter,
+.slide-fade-leave-to {
+  transform: translateY(-10px);
+  opacity: 0;
+}

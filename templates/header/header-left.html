@@ -1,0 +1,79 @@
+
+
+<header class="left-panel">
+    <aside class="left-panel-wrapper">
+        <div class="left-panel-wrapper-link{% if not open %} left-panel-wrapper-link-selected{% endif %}">
+              {% if current_user.role.name == 'admin' %}
+              <a class="left-panel-wrapper-navigation" href="{{ url_for('users') }}">
+                {% include 'header/icons/icon-users.html' %}
+                <div class="left-panel-wrapper-navigation-content">Користувачі</div>
+                <div class="left-panel-wrapper-divider"></div>
+              </a>
+              {% endif %}
+              <a class="left-panel-wrapper-navigation" href="{{ url_for('datasets') }}">
+                {% include 'header/icons/icon-queue.html' %}
+                <div class="left-panel-wrapper-navigation-content">Датасет</div>
+                <div class="left-panel-wrapper-divider"></div>
+              </a>
+
+              <a class="left-panel-wrapper-navigation" href="{{ url_for('labels') }}">
+                {% include 'header/icons/icon-configuration.html' %}
+                <div class="left-panel-wrapper-navigation-content">Лейбли</div>
+                <div class="left-panel-wrapper-divider"></div>
+              </a>
+              {% if current_user.role.name == 'admin' %}
+              <a class="left-panel-wrapper-navigation" href="{{ url_for('trains') }}">
+                {% include 'header/icons/icon-train.html' %}
+                <div class="left-panel-wrapper-navigation-content">Навчання</div>
+                <div class="left-panel-wrapper-divider"></div>
+              </a>
+              {% endif %}
+        </div>
+
+        <div class="left-panel-wrapper-trigger">
+            <div class="left-panel-wrapper-trigger-divider">
+                <div class="left-panel-wrapper-navigation" onclick="toggleMenu()">
+                    <div class="flex flex-align-center" id="menu-toggle-open">
+                      {% include 'header/icons/icon-open.html' %}
+                    </div>
+                    <div class="flex flex-align-center" style="display: none" id="menu-toggle-close">
+                      {% include 'header/icons/icon-close.html' %}
+                    </div>
+                    <div class="left-panel-wrapper-navigation-content">Згорнути меню</div>
+              </div>
+            </div>
+        </div>
+    </aside>
+</header>
+
+<script>
+  let isOpen = false;
+  let visibility = document.querySelectorAll('.header-open-on-visible');
+  visibility.forEach(el => {
+      el.style.display = 'none';
+  });
+  function toggleMenu() {
+      let menuToggleOpen = document.getElementById('menu-toggle-open');
+      let menuToggleClose = document.getElementById('menu-toggle-close');
+      let menu = document.querySelector('.left-panel-wrapper');
+
+      // Toggle the 'open' class to change the appearance of the menu button
+      if (isOpen) {
+          menuToggleOpen.style.display = 'flex';
+          menuToggleClose.style.display = 'none';
+          visibility.forEach(el => {
+              el.style.display = 'none';
+          });
+          menu.classList.remove('left-panel-wrapper-open');
+          isOpen = false;
+      } else {
+          menuToggleOpen.style.display = 'none';
+          menuToggleClose.style.display = 'flex';
+          visibility.forEach(el => {
+              el.style.display = 'block';
+          });
+          menu.classList.add('left-panel-wrapper-open');
+          isOpen = true;
+      }
+  }
+</script>

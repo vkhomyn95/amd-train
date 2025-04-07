@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+
+{% include 'head.html' %}
+
+<body>
+
+{% include 'header/header-top.html' %}
+
+<div class="container">
+
+    {% include 'header/header-left.html' %}
+
+    <div class="container-main">
+        <div class="breadcrumb">
+            <a class="breadcrumb-navigation flex flex-align-center" href="{{ url_for('datasets') }}">
+                {% include 'header/icons/icon-breadcrumb.html' %}
+            </a>
+            <div class="breadcrumb-heading flex flex-align-center">
+                <div class="breadcrumb-heading-previous ml-15">
+                    Датасет
+                </div>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="mange-wrapper">
+                <div class="card" style="width: 30%">
+                    <div class="p-20">
+                        <span class="card-title">
+                            Налаштування
+                        </span>
+                    </div>
+                    <div class="card-border"></div>
+                    <div class="card-body">
+                        <div class="card-body-wrapper">
+                            <div class="flex flex-direction-row flex-align-center p-20" style="padding-bottom: 0">
+                                <div class="label"  style="width: 70%">Країна</div>
+                                <div class="w-100">
+                                    {{ dataset.country }}
+                                </div>
+                            </div>
+
+                            <div class="flex flex-direction-row flex-align-center p-20">
+                                <div class="label" style="width: 70%">Кількість файлів</div>
+                                <div class="w-100">
+                                    {{ files|length }}
+                                </div>
+                            </div>
+
+                            <div class="card-border"></div>
+
+                            <div class="upload-form w-100 p-20">
+                                <form action="/datasets/{{ dataset.id }}/upload" method="post"
+                                      enctype="multipart/form-data">
+                                  <div class="drop-zone">
+                                    <span class="drop-zone__prompt">Drop files here or click to upload</span>
+                                    <input type="file" name="files" class="drop-zone__input" multiple>
+                                  </div>
+                                    <input type="hidden" name="directory_folder" value="{{ current_directory.replace(base_directory + '/', '') }}">
+                                    <button class="button button-main" type="submit">
+                                        {% include 'header/icons/icon-add.html' %}
+                                        <span style="margin-left: 10px; color: #ffffff;">Завантажити файли</span>
+                                     </button>
+                                </form>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="card ml-15">
+                    <div class="p-20">
+                        <span class="card-title">
+                            Директорії
+                        </span>
+                    </div>
+                    <div class="card-border"></div>
+                    <div class="card-body">
+                        <div class="card-body-wrapper">
+                            <ul class="file-list">
+                                {% if current_directory != base_directory %}
+                                <li style="height: 55px">
+                                    <a href="/datasets/{{ dataset.id }}">.../</a>
+                                </li>
+                                 {% endif %}
+                                 {% for directory in directories %}
+                                    <li style="height: 55px">
+                                        <a href="/datasets/{{ dataset.id }}?directory_folder={{ directory }}">{{ directory }}</a>
+                                    </li>
+                                  {% endfor %}
+                                {% for file in files %}
+                                <li style="height: 55px">
+                                    {% if file.stored %}
+                                        <span>{{ file.filename }} <span style="color: green">(Збережено в базі даних)</span></span>
+                                    {% else %}
+                                        <span>{{ file.filename }} <span style="color: firebrick">(Не збережено в базі даних)</span></span>
+                                    {% endif %}
+                                    <div class="file-actions flex flex-align-center">
+                                        {% if file.filename.endswith(('.mp3', '.wav', '.ogg')) %}
+                                        <div class="audio-player-container"></div>
+                                        {% if file.stored %}
+                                        <div class="flex" style="width: 200px">
+                                            <select id="label" name="label_id" class="label-select" data-file-id="{{file.id}}" data-dataset-id="{{dataset.id}}">
+                                                <option value="" disabled selected>Оберіть лейбл</option>
+                                                {% for label in labels %}
+                                                <option value="{{ label.id }}" {% if label.id == file.label_id %}selected{%endif%}>{{ label.name }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        {% endif %}
+                                        <a href="#" onclick="playFile(this, '{{ dataset.id }}', '{{ file.filename }}', '{{ current_directory.replace(base_directory + '/', '') }}')">Play</a>
+                                        {% endif %}
+                                        <a href="/datasets/{{ dataset.id }}/download/{{ file.filename }}?directory_folder={{ current_directory.replace(base_directory + '/', '') }}">Download</a>
+                                        {% if current_user.role.name == 'admin' %}
+                                        <a href="/datasets/{{ dataset.id }}/delete/{{ file.filename }}?directory_folder={{ current_directory.replace(base_directory + '/', '') }}">Delete</a>
+                                        {% endif %}
+                                    </div>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <div class="footer-wrapper">
+                <button onclick="window.location.href = '/datasets'" class="button button-secondary is-link">
+                    Скасувати
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+ //Drag and drop
+document.querySelectorAll(".drop-zone__input").forEach((inputElement) => {
+  const dropZoneElement = inputElement.closest(".drop-zone");
+
+  dropZoneElement.addEventListener("click", (e) => {
+    inputElement.click();
+  });
+
+  inputElement.addEventListener("change", (e) => {
+    if (inputElement.files.length) {
+       [...inputElement.files].forEach(file => {
+        updateThumbnail(dropZoneElement, file, inputElement.files.length);
+       })
+
+    }
+  });
+
+  dropZoneElement.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    dropZoneElement.classList.add("drop-zone--over");
+  });
+
+  ["dragleave", "dragend"].forEach((type) => {
+    dropZoneElement.addEventListener(type, (e) => {
+      dropZoneElement.classList.remove("drop-zone--over");
+    });
+  });
+
+  dropZoneElement.addEventListener("drop", (e) => {
+    e.preventDefault();
+
+    if (e.dataTransfer.files.length) {
+        [...e.dataTransfer.files].forEach(file => {
+             updateThumbnail(dropZoneElement, file, e.dataTransfer.files.length);
+        })
+      inputElement.files = e.dataTransfer.files;
+
+    }
+
+    dropZoneElement.classList.remove("drop-zone--over");
+  });
+});
+
+/**
+ * Updates the thumbnail on a drop zone element.
+ * @param {HTMLElement} dropZoneElement
+ * @param {File} file
+ */
+function updateThumbnail(dropZoneElement, file, size) {
+  let thumbnailElement = dropZoneElement.querySelector(".drop-zone__thumb");
+
+  // First time - remove the prompt
+  if (dropZoneElement.querySelector(".drop-zone__prompt")) {
+    dropZoneElement.querySelector(".drop-zone__prompt").remove();
+  }
+
+  // First time - there is no thumbnail element, so lets create it
+  if (!thumbnailElement) {
+    thumbnailElement = document.createElement("div");
+    thumbnailElement.innerHTML = `<div class="flex flex-align-center flex-content-center" style="height: 100%">${size} Файлів</div>`
+    thumbnailElement.classList.add("drop-zone__thumb");
+    dropZoneElement.appendChild(thumbnailElement);
+  }
+
+  thumbnailElement.dataset.label = file.name;
+
+  // Show thumbnail for image files
+  if (file.type.startsWith("image/")) {
+    const reader = new FileReader();
+
+    reader.readAsDataURL(file);
+    reader.onload = () => {
+      thumbnailElement.style.backgroundImage = `url('${reader.result}')`;
+    };
+  } else {
+    thumbnailElement.style.backgroundImage = null;
+  }
+}
+//play file
+async function playFile(element, datasetId, filename, directory_folder) {
+  const response = await fetch(`/datasets/${datasetId}/play/${filename}?directory_folder=${directory_folder}`);
+  const data = await response.json();
+  const audioPlayerContainer = element.parentNode.querySelector(".audio-player-container");
+   audioPlayerContainer.innerHTML = `
+    <audio controls autoplay>
+      <source src="${data.file_path}" type="audio/mpeg">
+      Your browser does not support the audio element.
+    </audio>
+  `;
+}
+
+
+document.querySelectorAll('.label-select').forEach(selectElement => {
+  selectElement.addEventListener('change', async (event) => {
+    const fileId = event.target.dataset.fileId;
+    const datasetId = event.target.dataset.datasetId;
+    const newLabelId = event.target.value;
+
+    try {
+      const response = await fetch(`/datasets/${datasetId}/audio_files/${fileId}/update_label`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: `label_id=${newLabelId}`
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      showToast("Label updated successfully:", data)
+    } catch (error) {
+        showToast("Failed to update label:", error)
+    }
+  });
+});
+
+function showToast(message) {
+    let notifications = document.querySelector(".notifications");
+
+    if (!notifications) {
+        notifications = document.createElement("ul");
+        notifications.className = "notifications";
+        document.body.appendChild(notifications);
+    }
+
+    let toast = document.createElement("li");
+    toast.className = "toast error";
+
+    toast.innerHTML = `
+        <div class="column">
+            <span>${message}</span>
+        </div>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" onclick="removeToast(this.parentElement)">
+            <path d="M18 6L6 18" stroke="#333333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M6 6L18 18" stroke="#333333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+    `;
+
+    notifications.appendChild(toast);
+
+    toast.timeoutId = setTimeout(() => removeToast(toast), 5000);
+}
+
+const removeToast = (toast) => {
+  toast.classList.add("hide")
+  if (toast.timeoutId) clearTimeout(toast.timeoutId)
+  setTimeout(() => toast.remove(), 500)
+}
+</script>
+<div id="audioPlayerContainer"></div>
+</body>
+</html>

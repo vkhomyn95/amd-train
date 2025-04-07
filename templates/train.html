@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+
+{% include 'head.html' %}
+
+<body>
+
+{% include 'header/header-top.html' %}
+
+<div class="container">
+
+    {% include 'header/header-left.html' %}
+
+    <div class="container-main">
+        <div class="breadcrumb">
+            <a class="breadcrumb-navigation flex flex-align-center" href="{{ url_for('trains') }}">
+                {% include 'header/icons/icon-breadcrumb.html' %}
+            </a>
+            <div class="breadcrumb-heading flex flex-align-center">
+                <div class="breadcrumb-heading-previous ml-15">
+                    Навчання
+                </div>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="mange-wrapper">
+                <div class="card" style="width: 40%">
+                    <div class="p-20">
+                        <span class="card-title">
+                            Налаштування
+                        </span>
+                    </div>
+                    <div class="card-border"></div>
+                    <div class="card-body">
+                        <div class="card-body-wrapper">
+                            <form id="downloadForm" method="get">
+
+                                <div class="flex flex-direction-row flex-align-center p-20" style="padding-bottom: 0">
+                                    <div class="label"  style="width: 70%">Назва</div>
+                                    <div class="w-100">
+                                        {{ train.name }}
+                                    </div>
+                                    <input
+                                                class="input"
+                                                type="hidden"
+                                                id="train_id"
+                                                name="train_id"
+                                                value="{{ train.id }}"
+                                        />
+                                    <input
+                                                class="input"
+                                                type="hidden"
+                                                id="train_status"
+                                                name="train_status"
+                                                value="{{ train.status }}"
+                                        />
+                                </div>
+                                <div class="flex flex-direction-row flex-align-center p-20" style="padding-bottom: 0">
+                                    <div class="label"  style="width: 70%">Частота</div>
+                                    <div class="w-100">
+                                       <input
+                                                class="input"
+                                                type="text"
+                                                id="sample_rate"
+                                                name="sample_rate"
+                                                value="{{ train.sample_rate }}"
+                                        />
+                                    </div>
+                                </div>
+                                <div class="flex flex-direction-row flex-align-center p-20" style="padding-bottom: 0">
+                                    <div class="label"  style="width: 70%">Кількітсь семплів</div>
+                                    <div class="w-100">
+                                       <input
+                                                class="input"
+                                                type="text"
+                                                id="num_samples"
+                                                name="num_samples"
+                                                value="{{ train.num_samples }}"
+                                        />
+                                    </div>
+                                </div>
+                                <div class="flex flex-direction-row flex-align-center p-20" style="padding-bottom: 0">
+                                    <div class="label"  style="width: 70%">Кількітсь фолдів</div>
+                                    <div class="w-100">
+                                       <input
+                                                class="input"
+                                                type="text"
+                                                id="fold"
+                                                name="epochs"
+                                                value="{{ train.fold }}"
+                                        />
+                                    </div>
+                                </div>
+                                <div class="flex flex-direction-row flex-align-center p-20" style="padding-bottom: 0">
+                                    <div class="label"  style="width: 70%">Кількітсь епох</div>
+                                    <div class="w-100">
+                                       <input
+                                                class="input"
+                                                type="text"
+                                                id="epochs"
+                                                name="epochs"
+                                                value="{{ train.epochs }}"
+                                        />
+                                    </div>
+                                </div>
+                                <div class="flex flex-direction-row flex-align-center p-20" style="padding-bottom: 0">
+                                    <div class="label"  style="width: 70%">Кількість батчів</div>
+                                    <div class="w-100">
+                                       <input
+                                                class="input"
+                                                type="text"
+                                                id="batch_size"
+                                                name="batch_size"
+                                                value="{{ train.batch_size }}"
+                                        />
+                                    </div>
+                                </div>
+                                <div class="flex flex-direction-row flex-align-center p-20" style="padding-bottom: 0">
+                                    <div class="label"  style="width: 70%">Датасети</div>
+                                    <div class="w-100">
+                                        {% for dataset in train.datasets %}
+                                        <span class="mt-10">
+                                            {{dataset.country}}
+                                        </span>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                <div class="flex flex-direction-row flex-align-center p-20" style="padding-bottom: 0">
+                                    <div class="label"  style="width: 70%">Переглянути</div>
+                                    <div class="w-100">
+                                        <button class="button button-main" style="padding: 5px 15px" type="submit" onclick="downloadCsv('{{ train.id }}','{{train.name}}')">Завантажити датасет</button>
+                                    </div>
+                                </div>
+                                <div class="flex flex-direction-row flex-align-center p-20" style="padding-bottom: 0">
+                                    <div class="label"  style="width: 70%">Навчання</div>
+                                    <div class="w-100">
+                                        <button id="start_train_button" class="button button-primary" style="padding: 5px 15px" type="button" onclick="startTrain('{{ train.id }}')">Запустити навчання</button>
+                                    </div>
+                                </div>
+
+                                <div class="flex flex-direction-row flex-align-center p-20" style="padding-bottom: 0">
+                                    <div class="label"  style="width: 70%">Статус</div>
+                                    <div class="w-100">
+                                        <span id="status_{{train.id}}">{{ train.status}}</span>
+                                    </div>
+                                </div>
+                                <div class="flex flex-direction-row flex-align-center p-20" style="padding-bottom: 0">
+                                    <div class="label"  style="width: 70%">Джоба</div>
+                                    <div class="w-100">
+                                        {{train.job_id}}
+                                    </div>
+                                </div>
+                                <div class="flex flex-direction-row flex-align-center p-20" style="padding-bottom: 0">
+                                    <div class="label"  style="width: 70%">Моніторинг</div>
+                                    <div class="w-100">
+                                        <a href="http://localhost:6006/" target="_blank">Open TensorBoard</a>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="card ml-15">
+                    <div class="p-20">
+                        <span class="card-title">
+                            Процес
+                        </span>
+                    </div>
+                    <div class="card-border"></div>
+                    <div class="card-body">
+                        <div class="card-body-wrapper" style="background: #fff6db; margin: 10px; padding: 10px">
+                            <pre id="logOutput" style="line-height: 25px"></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <div class="footer-wrapper">
+                <button onclick="window.location.href = '/trains'" class="button button-secondary is-link">
+                    Скасувати
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    const logOutput = document.getElementById('logOutput');
+
+    let eventSource = null;
+
+    function appendToLogOutput(message) {
+        if (logOutput) {
+            logOutput.textContent += message + '\n';
+            logOutput.scrollTop = logOutput.scrollHeight;
+        }
+    }
+
+    async function loadLogsFromFile() {
+        let trainId = document.getElementById("train_id").value;
+
+        try {
+            const response = await fetch(`/trains/${+trainId}/logs/file`);
+
+            let trainStatus = document.getElementById("train_status").value;
+
+            if (trainStatus === 'TrainStatus.RUNNING' || trainStatus === 'TrainStatus.QUEUED') return;
+
+            if (response.ok) {
+                const logText = await response.text(); // Отримуємо текстовий вміст
+                console.log(`Logs loaded successfully (${logText.length} chars).`);
+                // appendToLogOutput("--- Logs loaded from file ---");
+                appendToLogOutput(logText); // Відображаємо завантажені логи
+            } else {
+                // Обробка помилок HTTP (404, 500, etc.)
+                const errorText = await response.text(); // Спробувати отримати текст помилки
+                console.error(`Failed to load logs: ${response.status} ${response.statusText}`, errorText);
+                appendToLogOutput(`--- Error loading logs ---`);
+                appendToLogOutput(`Status: ${response.status} ${response.statusText}`);
+                appendToLogOutput(`Details: ${errorText || '(No details provided)'}`);
+            }
+
+        } catch (error) {
+            // Обробка мережевих помилок або інших збоїв fetch
+            console.error('Network error or other failure while loading logs:', error);
+            appendToLogOutput(`--- Error loading logs ---`);
+            appendToLogOutput(`Network or client-side error: ${error.message}`);
+        } finally {
+            // Завжди вмикаємо кнопку назад
+        }
+    }
+
+    function connectToLogStream() {
+        // Закриваємо попереднє з'єднання, якщо воно є
+        let trainId = document.getElementById("train_id").value;
+        let trainStatus = document.getElementById("train_status").value;
+        console.log(trainStatus)
+        if (trainStatus !== 'TrainStatus.RUNNING' || trainStatus !== 'TrainStatus.RUNNING') return;
+
+        if (eventSource) {
+            eventSource.close();
+            console.log('Previous EventSource closed.');
+        }
+
+        logOutput.innerHTML = ''; // Очистити попередні логи
+        logOutput.innerHTML += 'Connecting to log stream...\n';
+
+        // Створюємо нове з'єднання SSE
+        eventSource = new EventSource(`/trains/${trainId}/logs/stream`);
+
+        eventSource.onopen = function(event) {
+            console.log('SSE Connection opened.');
+            // logOutput.innerHTML += 'Connection established. Waiting for logs...\n'; // Повідомлення вже надсилається сервером
+        };
+
+        eventSource.onmessage = function(event) {
+            // Додаємо отриманий лог
+            const logLine = event.data;
+            logOutput.innerHTML += logLine + '\n';
+            // Автоматично прокручувати вниз
+            logOutput.scrollTop = logOutput.scrollHeight;
+
+             // Якщо отримали повідомлення про завершення, закриваємо з'єднання
+             if (logLine.includes("--- Training task finished")) {
+                  console.log("Received task finished signal. Closing EventSource.");
+                  eventSource.close();
+                  // Можна оновити статус на сторінці
+                  updateStatusIndicator(trainId, 'COMPLETED'); // Приклад функції
+             }
+        };
+
+        eventSource.onerror = function(event) {
+            console.error('EventSource failed:', event);
+            logOutput.innerHTML += '--- Error connecting to log stream or stream closed. ---\n';
+            if (eventSource.readyState === EventSource.CLOSED) {
+                 console.log('SSE Connection was closed.');
+                 // Можна спробувати перепідключитися або просто повідомити користувача
+            }
+            eventSource.close(); // Закрити остаточно при помилці
+        };
+    }
+
+    async function downloadCsv(trainId, trainName) {
+        try {
+            const form = document.getElementById('downloadForm');
+
+            form.action = `/trains/${trainId}/download_csv`
+
+            form.submit();
+
+        } catch (error) {
+            console.error('Failed to download CSV:', error);
+        }
+    }
+
+    async function startTrain(trainId) {
+        console.log(`Attempting to start train: ${trainId})`);
+        // Отримати параметри з форми (або передати їх інакше)
+        const sampleRate = document.getElementById('sample_rate').value; // Приклад
+        const numSamples = document.getElementById('num_samples').value; // Приклад
+        const epochs = document.getElementById('epochs').value; // Приклад
+        const fold = document.getElementById('fold').value; // Приклад
+        const batchSize = document.getElementById('batch_size').value; // Приклад
+
+        // Показати індикатор завантаження/очікування
+        showLoadingIndicator(trainId); // Ваша функція для UI
+
+        try {
+            // Надсилаємо POST запит на запуск фонової задачі
+            const response = await fetch(`/trains/${trainId}/start_background?sample_rate=${sampleRate}&num_samples=${numSamples}&epochs=${epochs}&batch_size=${batchSize}`, { // Передаємо параметри як Query Params
+                 method: 'POST',
+                 headers: {
+                     'Accept': 'application/json'
+                     // Можливо, додати CSRF токен, якщо використовуєте
+                 }
+                 // Якщо передавати в тілі:
+                 // headers: { 'Content-Type': 'application/json' },
+                 // body: JSON.stringify({ sample_rate: sampleRate, ... })
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                console.log('Train started successfully:', result);
+                // Запускаємо прослуховування логів
+                connectToLogStream();
+                // Оновити статус на сторінці (наприклад, на "QUEUED" або "RUNNING")
+                updateStatusIndicator(trainId, 'QUEUED');
+            } else {
+                console.error('Failed to start train:', result.detail || response.statusText);
+                hideLoadingIndicator(trainId);
+            }
+
+        } catch (error) {
+            console.error('Network error or failed to start train:', error);
+            hideLoadingIndicator(trainId);
+        }
+    }
+
+    function showLoadingIndicator(trainId) {
+    // Показати спінер або змінити текст кнопки
+        const button = document.getElementById('start_train_button');
+        if(button) button.disabled = true; button.textContent = 'Starting...';
+    }
+
+    function hideLoadingIndicator(trainId) {
+         const button = document.getElementById(`start_train_button`);
+         if(button) button.disabled = false; button.textContent = 'Start Train';
+    }
+
+    function updateStatusIndicator(trainId, status) {
+        const statusElement = document.getElementById(`status_${trainId}`); // Наприклад <span id="status_123"></span>
+        if (statusElement) {
+            statusElement.textContent = `Status: ${status}`;
+            statusElement.className = `status ${status.toLowerCase()}`; // Для CSS стилів
+        }
+         // Якщо статус фінальний, знову активувати кнопку
+         if (status === 'COMPLETED' || status === 'FAILED') {
+             hideLoadingIndicator(trainId);
+         }
+    }
+
+    loadLogsFromFile();
+    connectToLogStream()
+</script>
+</body>
+</html>

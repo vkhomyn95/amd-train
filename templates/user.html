@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+
+{% include 'head.html' %}
+
+<body>
+
+{% include 'header/header-top.html' %}
+
+
+<div class="container">
+
+    {% include 'header/header-left.html' %}
+
+    <div class="container-main">
+        <div class="breadcrumb">
+            {% if is_profile %}
+
+                <a class="breadcrumb-navigation flex flex-align-center">
+                 {% include 'header/icons/icon-breadcrumb.html' %}
+                </a>
+            {% else %}
+                <a class="breadcrumb-navigation flex flex-align-center" href="{{ url_for('users') }}">
+                    {% include 'header/icons/icon-breadcrumb.html' %}
+                </a>
+            {% endif %}
+            <div class="breadcrumb-heading flex flex-align-center">
+                <div class="breadcrumb-heading-previous ml-15">
+                    {% if is_profile %}
+                        Мій профіль
+                    {% else %}
+                        Користувачі
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="content">
+            <form
+                    method="POST"
+                    id="userForm"
+                    class="mange-wrapper"
+                    action="{% if not user.id %}{{ url_for('user_create') }}{% else %}{{ url_for('user_update', user_id=user.id) }}{% endif %}">
+
+                <div class="card">
+                    <div class="p-20">
+                        <span class="card-title">
+                            Користувач
+                        </span>
+                    </div>
+                    <div class="card-border"></div>
+                    <div class="card-body">
+                        <div class="card-body-wrapper p-20">
+                            <input class="input is-success" type="hidden" id="user_id" name="id" value="{{ user.id }}">
+                            <div class="flex flex-direction-row flex-align-center mb-20">
+                                <label class="label label-required_danger" for="username">Логін</label>
+                                <div class="w-100">
+                                    <input
+                                            class="input"
+                                            type="text"
+                                            id="username"
+                                            name="username"
+                                            placeholder="Логін"
+                                            value="{{ user.username if user and user.username else '' }}"
+                                            oninput="validateField(this)"
+                                            {% if user.id is not none %}
+                                                {% if user.id > 0 %}
+                                                    readonly
+                                                {% endif %}
+                                            {% endif %}
+                                    />
+                                </div>
+                            </div>
+
+                            <div class="flex flex-direction-row flex-align-center mb-20">
+                                <label class="label label-required_danger" for="last_name">Прізвище</label>
+                                <div class="w-100">
+                                    <input
+                                            class="input"
+                                            type="text"
+                                            id="last_name"
+                                            name="last_name"
+                                            placeholder="Прізвище"
+                                            value="{{ user.last_name if user and user.last_name else ''  }}"
+                                            oninput="validateField(this)"
+                                    />
+                                </div>
+                            </div>
+
+                            <div class="flex flex-direction-row flex-align-center mb-20">
+                                <label class="label label-required_danger" for="first_name">Ім'я</label>
+                                <div class="w-100">
+                                    <input
+                                            class="input"
+                                            type="text"
+                                            id="first_name"
+                                            name="first_name"
+                                            placeholder="Ім'я"
+                                            value="{{ user.first_name if user and user.first_name else ''  }}"
+                                            oninput="validateField(this)"
+                                    />
+                                </div>
+                            </div>
+
+                            <div class="flex flex-direction-row flex-align-center mb-20">
+                                <label class="label label-required_danger" for="email">Email</label>
+                                <div class="w-100">
+                                    <input
+                                            class="input"
+                                            type="text"
+                                            id="email"
+                                            name="email"
+                                            placeholder="Email"
+                                            value="{{ user.email if user and user.email else '' }}"
+                                            oninput="validateField(this)"
+                                            {% if user.id is not none %}
+                                                {% if user.id > 0 %}
+                                                    readonly
+                                                {% endif %}
+                                            {% endif %}
+
+                                    />
+                                </div>
+                            </div>
+
+                            <div class="flex flex-direction-row flex-align-center mb-20">
+                                <label class="label label-required_danger" for="phone">Телефон</label>
+                                <div class="w-100">
+                                    <input
+                                            class="input"
+                                            type="text"
+                                            id="phone"
+                                            name="phone"
+                                            placeholder="Телефон"
+                                            value="{{ user.phone if user and user.phone else '' }}"
+                                            oninput="validateField(this)"
+                                    />
+                                </div>
+                            </div>
+
+                            <div class="flex flex-direction-row flex-align-center mb-20">
+                                <label class="label label-required_danger" for="password">Пароль</label>
+                                <div class="w-100">
+                                    <input
+                                            class="input"
+                                            type="text"
+                                            id="password"
+                                            name="password"
+                                            placeholder="Приховано"
+                                            oninput="validatePassword(this)"
+                                            autocomplete="off"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="footer">
+            <div class="footer-wrapper">
+                {% if is_profile and role=='admin' or role=='guest'%}
+                    <button onclick="window.location.href = '/dashboard'" class="button button-secondary is-link">
+                        Скасувати
+                    </button>
+                {% else %}
+                    <button onclick="window.location.href = '/users'" class="button button-secondary is-link">
+                        Скасувати
+                    </button>
+                {% endif %}
+                <button onclick="saveForm()" class="button button-primary ml-10">
+                    <svg width="21" height="20" viewBox="0 0 21 20" fill="none" xmlns="http://www.w3.org/2000/svg" class="button-svg"><path d="M17.1522 7.25833L13.1272 3.23333C12.6588 2.76436 12.0233 2.50058 11.3605 2.5H5.3855C4.72246 2.5 4.08657 2.76339 3.61773 3.23223C3.14889 3.70107 2.8855 4.33696 2.8855 5V15C2.8855 15.663 3.14889 16.2989 3.61773 16.7678C4.08657 17.2366 4.72246 17.5 5.3855 17.5H15.3855C16.0485 17.5 16.6844 17.2366 17.1533 16.7678C17.6221 16.2989 17.8855 15.663 17.8855 15V9.025C17.8849 8.36218 17.6211 7.72672 17.1522 7.25833ZM8.71883 15.8333V14.1667H12.0522V15.8333H8.71883ZM16.2188 15C16.2188 15.221 16.131 15.433 15.9748 15.5893C15.8185 15.7455 15.6065 15.8333 15.3855 15.8333H13.7188V13.3333C13.7188 13.1123 13.631 12.9004 13.4748 12.7441C13.3185 12.5878 13.1065 12.5 12.8855 12.5H7.8855C7.66448 12.5 7.45252 12.5878 7.29624 12.7441C7.13996 12.9004 7.05216 13.1123 7.05216 13.3333V15.8333H5.3855C5.16448 15.8333 4.95252 15.7455 4.79624 15.5893C4.63996 15.433 4.55216 15.221 4.55216 15V5C4.55216 4.77899 4.63996 4.56702 4.79624 4.41074C4.95252 4.25446 5.16448 4.16667 5.3855 4.16667H7.05216V8.33333C7.05216 8.55435 7.13996 8.76631 7.29624 8.92259C7.45252 9.07887 7.66448 9.16667 7.8855 9.16667H11.2188C11.4398 9.16667 11.6518 9.07887 11.8081 8.92259C11.9644 8.76631 12.0522 8.55435 12.0522 8.33333C12.0522 8.11232 11.9644 7.90036 11.8081 7.74408C11.6518 7.5878 11.4398 7.5 11.2188 7.5H8.71883V4.16667H11.3605C11.5811 4.16974 11.7925 4.25606 11.9522 4.40833L15.9772 8.43333C16.0544 8.5112 16.1155 8.60355 16.157 8.70508C16.1984 8.80661 16.2195 8.91533 16.2188 9.025V15Z" fill="#252525"></path></svg>
+                    <span class="ml-10">Зберегти</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function changeRecognitionTab(el, tab) {
+        el.classList.add("is-active");
+        if (tab === 'interim') {
+            document.querySelector(".voice-tab-header").classList.remove("is-active");
+            document.querySelector(".interim-tab").classList.remove("is-hidden");
+            document.querySelector(".voice-tab").classList.add("is-hidden");
+        }
+        if (tab === 'voice') {
+            document.querySelector(".interim-tab").classList.add("is-hidden");
+            document.querySelector(".voice-tab").classList.remove("is-hidden");
+            document.querySelector(".interim-tab-header").classList.remove("is-active");
+        }
+
+    }
+
+    function validatePassword(event) {
+        const userId = +document.getElementById("user_id").value;
+        if (userId === 0 || event.value.length >= 1) {
+            return validateField(event)
+        }
+        return true
+    }
+
+    function validateUserForm() {
+        /**
+         * User form validation */
+        let isValid = true;
+        let listValidations = [];
+        let username = document.getElementById("username");
+        isValid = validateField(username);
+        if (!isValid)
+            listValidations.push(false);
+        let firstName = document.getElementById("first_name");
+        isValid = validateField(firstName);
+        if (!isValid)
+            listValidations.push(false);
+        let lastName = document.getElementById("last_name");
+        isValid = validateField(lastName);
+        if (!isValid)
+            listValidations.push(false);
+        let email = document.getElementById("email");
+        isValid = validateField(email);
+        if (!isValid)
+            listValidations.push(false);
+        let phone = document.getElementById("phone");
+        isValid = validateField(phone);
+        if (!isValid)
+            listValidations.push(false);
+        let password = document.getElementById("password");
+        isValid = validatePassword(password);
+        if (!isValid) {
+            listValidations.push(false);
+        }
+        if (listValidations.some(v => v === false)) {
+            return;
+        }
+        if (isValid)
+            document.getElementById("userForm").submit();
+    }
+
+    function validateField(field) {
+        /**
+         * User field validation */
+        if (field.value.length >= 5) {
+            if (field.classList.contains("is-danger")) {
+                field.classList.replace("is-danger", "is-success")
+                return true;
+            } else {
+                field.classList.add("is-success");
+                return true;
+            }
+        } else {
+            if (field.classList.contains("is-success")) {
+                field.classList.replace("is-success", "is-danger")
+                return false;
+            } else {
+                field.classList.add("is-danger");
+                return false;
+            }
+        }
+    }
+
+    function saveForm() {
+        event.preventDefault();
+        validateUserForm();
+    }
+</script>
+</body>
+</html>

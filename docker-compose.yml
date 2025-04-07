@@ -1,0 +1,31 @@
+version: '3.9'
+
+services:
+  web:
+    build: .
+    network_mode: host
+    container_name: amd-train
+    restart: always
+    volumes:
+      - "/stor:/stor"
+    environment:
+      LOGGER_DIR: '/stor/data/logs/amd-train/'
+      FILE_DIR: '/stor/data/amd-train/'
+      SQLALCHEMY_DATABASE_URI: 'mysql://root:root@127.0.0.1/amd_train'
+      USER_DEFAULT_PASSWORD: ''
+
+  worker:
+    build: .
+    command: ["arq", "utility.arq_worker.WorkerSettings"]
+    container_name: amd-train-worker
+    restart: always
+    volumes:
+      - "/stor:/stor"
+
+  tensorboard:
+    build: .
+    command: ["tensorboard", "--logdir", "/stor/data/amd-train", "--host", "0.0.0.0"]
+    container_name: amd-train-tensorboard
+    volumes:
+      - "/stor:/stor"
+    network_mode: host

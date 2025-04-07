@@ -1,0 +1,16 @@
+uvicorn
+fastapi
+starlette[full]
+sqlalchemy
+pymysql
+werkzeug
+mysqlclient
+pycountry
+torch
+torchsummary
+pandas
+torchaudio
+torchsampler
+tensorboard
+arq
+sse-starlette

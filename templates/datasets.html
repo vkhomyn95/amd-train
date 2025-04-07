@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+
+{% include 'head.html' %}
+
+<body>
+
+{% include 'header/header-top.html' %}
+
+<div class="container">
+
+    {% include 'header/header-left.html' %}
+
+    <div class="container-main">
+        <div class="breadcrumb">
+            <div class="breadcrumb-navigation flex flex-align-center">
+                {% include 'header/icons/icon-breadcrumb.html' %}
+            </div>
+            <div class="breadcrumb-heading flex flex-align-center">
+                <div class="breadcrumb-heading-previous ml-15">
+                    Датасети
+                </div>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="content-wrapper">
+                <div class="content-wrapper-head">
+                    <div class="content-head-heading">
+                        <div class="content-wrapper-head-header-heading">
+                            Конфігурації
+                        </div>
+                        <div class="content-wrapper-head-header-description">
+                            Управління
+                        </div>
+                    </div>
+                    <div class="content-wrapper-head-actions">
+                        <button class="button button-main" onclick="openModal()">
+                            {% include 'header/icons/icon-add.html' %}
+                            <span style="margin-left: 10px; color: #ffffff;">Додати датасет</span>
+                        </button>
+                    </div>
+                </div>
+
+                {% set headings = [
+                    {'name': 'ID'},
+                    {'name': 'Дата створення'},
+                    {'name': 'Країна'},
+                    {'name': 'Користувач'},
+                    {'name': 'Дії', 'actions': True},
+                ] %}
+
+                <div class="table-header">
+                    {% for heading in headings %}
+                    <div style="width: {% if not heading.actions %}21%{% else %}60px{% endif %};">
+                        {{ heading.name }}
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="content-wrapper-info">
+                    <div class="table-content">
+                        {% for dataset in datasets %}
+                        <div class="table-row">
+                            <div style="width: 21%">{{ dataset.id }}</div>
+                            <div style="width: 21.5%" class="created-date">{{ dataset.created_date }}</div>
+                            <div style="width: 21.5%">{{ dataset.country }}</div>
+                            <div style="width: 21.5%">{{ dataset.user_id }}</div>
+
+                            <div style="width: 60px">
+                                <div class="is-flex-direction-row is-align-content-center">
+                                    <a href="{{ url_for('dataset', dataset_id=dataset.id) }}" style="color: #00475A">
+                                      {% include 'header/icons/icon-edit.html' %}
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% with page=page, total_pages=total_pages, start_page=start_page, end_page=end_page, template='datasets' %}
+            {% include "pagination.html" %}
+        {% endwith %}
+    </div>
+</div>
+
+<!-- Модальне вікно -->
+<div id="myModal" class="modal">
+    <div class="modal-content flex flex-direction-column flex-align-center">
+        <div class="flex flex-direction-row flex-content-between flex-align-center w-100">
+            <div>
+                <div class="content-wrapper-head-header-heading">Додати датасет</div>
+            </div>
+            <div class="close" onclick="closeModal()">×</div>
+        </div>
+        <form id="datasetForm" method="POST" action="{{ url_for('dataset_create') }}" class="w-100 mt-20 mb-10">
+            <select id="country" name="country">
+                <option value="" disabled selected>Оберіть країну</option>
+                {% for country in countries %}
+                <option value="{{ country.alpha_2 }}">{{ country.name }} ({{ country.alpha_2 }})</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="button button-main mt-10">Зберегти</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    function openModal() {
+        document.getElementById("myModal").style.display = "block";
+    }
+
+    function closeModal() {
+        document.getElementById("myModal").style.display = "none";
+    }
+
+    window.onclick = function(event) {
+        if (event.target == document.getElementById("myModal")) {
+            closeModal();
+        }
+    }
+
+    function convertUTCToLocal(utcDateString) {
+      const utcDate = new Date(utcDateString + 'Z');
+
+      const options = {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false,
+        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone // Ensures local timezone
+      };
+
+      const formatter = new Intl.DateTimeFormat('en-CA', options);
+      const formattedDateParts = formatter.formatToParts(utcDate);
+
+      // Extract parts and assemble into desired format
+      const year = formattedDateParts.find(part => part.type === 'year').value;
+      const month = formattedDateParts.find(part => part.type === 'month').value;
+      const day = formattedDateParts.find(part => part.type === 'day').value;
+      const hour = formattedDateParts.find(part => part.type === 'hour').value;
+      const minute = formattedDateParts.find(part => part.type === 'minute').value;
+      const second = formattedDateParts.find(part => part.type === 'second').value;
+
+      // Return the formatted date string
+      return `${year}-${month}-${day} ${hour}:${minute}:${second}`;
+    }
+    document.querySelectorAll('.table-row .created-date').forEach(element => {
+      const utcDate = element.textContent.trim();
+      element.textContent = convertUTCToLocal(utcDate);
+    });
+
+</script>
+
+<style>
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 600px;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+</style>
+</body>
+</html>

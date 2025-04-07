@@ -1,0 +1,33 @@
+<div class="pagination">
+  <nav class="pagination is-centered" role="navigation" aria-label="pagination">
+    <ul class="pagination-wrapper">
+        {% if page != 1 and total_pages > 3 and (page - 1) != 1 and (page - 2) != 1 %}
+            <li class="pagination-wrapper-option">
+                <a class="pagination-wrapper-option-button" href="?page=1&limit={{ limit if limit else 10 }}" aria-label="Goto page 1">1</a>
+            </li>
+            {% if page > 3 %}
+                <li class="ml-20">
+                    <span class="pagination-ellipsis">&hellip;</span>
+                </li>
+            {% endif %}
+        {% endif %}
+
+        {% for p in range(start_page, end_page + 1) %}
+            <li class="pagination-wrapper-option ml-20">
+                <a class="pagination-wrapper-option-button {% if p == page %}pagination-wrapper-option-button-active{% endif %}" href="?page={{ p }}&limit={{ limit if limit else 10 }}" aria-label="Goto page {{ p }}">{{ p }}</a>
+            </li>
+        {% endfor %}
+
+        {% if page != total_pages and total_pages > 3 and (page + 1) != total_pages and (page + 2) != total_pages %}
+            {% if page < total_pages - 2 %}
+                <li class="ml-20">
+                    <span class="pagination-ellipsis">&hellip;</span>
+                </li>
+            {% endif %}
+            <li class="pagination-wrapper-option ml-20">
+                <a class="pagination-wrapper-option-button" href="?page={{ total_pages }}&limit={{ limit if limit else 10 }}" aria-label="Goto page {{ total_pages }}">{{ total_pages }}</a>
+            </li>
+        {% endif %}
+    </ul>
+  </nav>
+</div>

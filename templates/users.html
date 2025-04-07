@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+
+{% include 'head.html' %}
+
+<body>
+
+{% include 'header/header-top.html' %}
+
+<div class="container">
+
+    {% include 'header/header-left.html' %}
+
+    <div class="container-main">
+        <div class="breadcrumb">
+            <div class="breadcrumb-navigation flex flex-align-center">
+                {% include 'header/icons/icon-breadcrumb.html' %}
+            </div>
+            <div class="breadcrumb-heading flex flex-align-center">
+                <div class="breadcrumb-heading-previous ml-15">
+                    Користувачі
+                </div>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="content-wrapper">
+                <div class="content-wrapper-head">
+                    <div class="content-head-heading">
+                        <div class="content-wrapper-head-header-heading">
+                            Користувачі
+                        </div>
+                        <div class="content-wrapper-head-header-description">
+                            Гостьові акаунти
+                        </div>
+                    </div>
+                    <div class="content-wrapper-head-actions">
+                        <button class="button button-main">
+                            {% include 'header/icons/icon-add.html' %}
+                            <a href="{{ url_for('user_create_form') }}" style="text-decoration: none">
+                                <span style="margin-left: 10px; color: #ffffff;">Додати користувача</span>
+                            </a>
+                        </button>
+                    </div>
+                </div>
+
+                {% set headings = [
+                    {'name': 'ID'},
+                    {'name': 'Дата створення'},
+                    {'name': 'Прізвище'},
+                    {'name': "Ім'я"},
+                    {'name': 'Телефон'},
+                    {'name': 'Дії', 'actions': True},
+                ] %}
+
+                <div class="table-header">
+                    {% for heading in headings %}
+                    <div style="width: {% if not heading.actions %}18%{% else %}60px{% endif %};">
+                        {{ heading.name }}
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="content-wrapper-info">
+                    <div class="table-content">
+                        {% for user in users %}
+                        <div class="table-row">
+                            <div style="width: 18%">{{ user.id }}</div>
+                            <div style="width: 18%" class="created-date">{{ user.created_date }}</div>
+                            <div style="width: 18%">{{ user.last_name }}</div>
+                            <div style="width: 18%">{{ user.first_name }}</div>
+                            <div style="width: 18%">{{ user.phone }}</div>
+
+                            <div style="width: 60px">
+                                <div class="is-flex-direction-row is-align-content-center">
+                                    <a href="{{ url_for('user', user_id=user.id) }}" style="color: #00475A">
+                                      {% include 'header/icons/icon-edit.html' %}
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% with page=page, total_pages=total_pages, start_page=start_page, end_page=end_page, template='users' %}
+            {% include "pagination.html" %}
+        {% endwith %}
+    </div>
+</div>
+<script>
+function convertUTCToLocal(utcDateString) {
+  // Parse the UTC date string to a Date object
+  const utcDate = new Date(utcDateString + 'Z'); // 'Z' indicates UTC timezone
+
+  // Format the Date object to the desired format in the local timezone
+  const options = {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+    timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone // Ensures local timezone
+  };
+
+  const formatter = new Intl.DateTimeFormat('en-CA', options);
+  const formattedDateParts = formatter.formatToParts(utcDate);
+
+  // Extract parts and assemble into desired format
+  const year = formattedDateParts.find(part => part.type === 'year').value;
+  const month = formattedDateParts.find(part => part.type === 'month').value;
+  const day = formattedDateParts.find(part => part.type === 'day').value;
+  const hour = formattedDateParts.find(part => part.type === 'hour').value;
+  const minute = formattedDateParts.find(part => part.type === 'minute').value;
+  const second = formattedDateParts.find(part => part.type === 'second').value;
+
+  // Return the formatted date string
+  return `${year}-${month}-${day} ${hour}:${minute}:${second}`;
+}
+document.querySelectorAll('.table-row .created-date').forEach(element => {
+  const utcDate = element.textContent.trim();
+  element.textContent = convertUTCToLocal(utcDate);
+});
+</script>
+</body>
+</html>

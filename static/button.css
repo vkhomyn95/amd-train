@@ -1,0 +1,54 @@
+.button {
+  display: flex;
+  align-items: center;
+  padding: 8px 16px;
+  border-radius: 5px;
+  outline: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.button-xs {
+  padding: 6px 16px;
+}
+
+.button-svg {
+  width: 16px;
+  height: 16px;
+}
+
+.button-main {
+  border: 1px solid #00475a;
+  background: #00475a;
+  color: #ffffff;
+}
+
+.button-secondary {
+  border: 1px solid #92929d;
+  background: #f5f5f8;
+  color: #92929d;
+}
+
+.button-primary {
+  border: 0.962px solid #ffd639;
+  background: #ffd639;
+  color: #333333;
+}
+
+.button-invisible {
+  border: 0.962px solid transparent;
+  background: transparent;
+  color: #92929d;
+}
+
+.button-invisible:hover {
+  border: 0.962px solid #ebebf2;
+}
+
+.button-round {
+  border: 0.962px solid #ebebf2;
+  background: transparent;
+  color: #92929d;
+}
