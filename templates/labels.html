@@ -34,6 +34,28 @@
 
         <div class="content">
             <div class="content-wrapper">
+                <div class="filter-header">
+                    Фільтр
+                </div>
+                <div class="filter">
+                    <div class="filter-item">
+                        <label for="label_name">Назва</label>
+                        <input id="label_name" class="input" type="text" name="name" />
+                    </div>
+                    <div class="filter-item">
+                        <label for="label_dataset">Датасет</label>
+                        <select id="label_dataset" name="dataset_id">
+                                <option value="" disabled selected>Оберіть датасет</option>
+                              {% for dataset in datasets %}
+                                <option value="{{ dataset.id }}">{{ dataset.country }}</option>
+                              {% endfor %}
+                        </select>
+                    </div>
+                    <button type="submit" class="button button-primary ml-15" onclick="saveFilter()">
+                        <span style="margin-left: 10px">Фільтрувати</span>
+                    </button>
+                    <button type="button" class="button button-secondary" onclick="resetFilter()">Очистити фільтр</button>
+                </div>
                 <div class="content-wrapper-head">
                     <div class="content-head-heading">
                         <div class="content-wrapper-head-header-heading">
@@ -177,6 +199,69 @@
       const utcDate = element.textContent.trim();
       element.textContent = convertUTCToLocal(utcDate);
     });
+
+function saveFilter() {
+      const nameInput = document.getElementById('label_name');
+      const datasetSelect = document.getElementById('label_dataset');
+
+      let queryString = '';
+      const params = [];
+
+      if (nameInput.value.trim() !== '') {
+        params.push(`name=${encodeURIComponent(nameInput.value.trim())}`);
+      }
+
+      if (datasetSelect.value !== '') {
+        params.push(`dataset_id=${encodeURIComponent(datasetSelect.value)}`);
+      }
+
+      // Отримуємо існуючі параметри з URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const limit = urlParams.get('limit');
+      const offset = urlParams.get('offset');
+
+      // Додаємо параметри пагінації до нових параметрів, якщо вони існують
+      if (limit) {
+        params.push(`limit=${encodeURIComponent(limit)}`);
+      }
+      if (offset) {
+        params.push(`offset=${encodeURIComponent(offset)}`);
+      }
+
+      if (params.length > 0) {
+        queryString = '?' + params.join('&');
+      }
+
+      const currentURL = window.location.pathname;
+      window.location.href = currentURL + queryString;
+}
+
+function resetFilter() {
+  document.getElementById('label_name').value = '';
+  document.getElementById('label_dataset').value = '';
+
+  const currentURLWithoutParams = window.location.pathname;
+  const defaultPaginationParams = '?page=1&limit=10';
+  window.location.href = currentURLWithoutParams + defaultPaginationParams;
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  const nameInput = document.getElementById('label_name');
+  const datasetSelect = document.getElementById('label_dataset');
+  const urlParams = new URLSearchParams(window.location.search);
+
+  const nameFromURL = urlParams.get('name');
+  const datasetIdFromURL = urlParams.get('dataset_id');
+
+  if (nameFromURL) {
+    nameInput.value = decodeURIComponent(nameFromURL);
+  }
+
+  if (datasetIdFromURL) {
+    datasetSelect.value = decodeURIComponent(datasetIdFromURL);
+  }
+});
+
 </script>
 
 <style>

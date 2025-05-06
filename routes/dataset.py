@@ -133,7 +133,7 @@ async def dataset(request: Request, dataset_id: int, directory_folder: str = Que
                 files.append({"filename": item, "stored": False, "label_id": 0, "id": None})
         elif os.path.isdir(item_path):
             directories.append(item)
-
+    files.sort(key=lambda x: (x['label_id'] is not None and x['label_id'] != 0, x['label_id'] or 0))
     labels = []
 
     if len(files) > 0:
@@ -157,7 +157,6 @@ async def dataset(request: Request, dataset_id: int, directory_folder: str = Que
 @router.post('/{dataset_id}/upload')
 async def upload_file(dataset_id: int, request: Request, directory_folder: str = Form(""), files: List[UploadFile] = File(...), db: Session = Depends(get_db)):
     session_user = await get_user(request)
-
     if not session_user:
         return RedirectResponse(url="/login/", status_code=303)
 

@@ -476,6 +476,13 @@ select {
   border-radius: 10px;
 }
 
+.drop-zone-buttons{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-around;
+}
+
 .drop-zone--over {
   border-style: solid;
 }
@@ -789,4 +796,31 @@ pre.exc_info {
 .badge {
     padding: 0.65em 0.35em;
     color: #ffffff;
+}
+
+.filter{
+    display: flex;
+    width: 100%;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    padding: 20px;
+}
+.filter-header{
+    padding: 20px 20px 0 20px;
+    color: #101828;
+    font-size: 18px;
+    font-weight: 500;
+    line-height: 26.925px;
+}
+.filter-item {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+    min-width: 200px;
+}
+
+.label-filter{
+    width: 200px;
 }

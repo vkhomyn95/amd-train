@@ -55,20 +55,26 @@
                                       enctype="multipart/form-data">
                                   <div class="drop-zone">
                                     <span class="drop-zone__prompt">Drop files here or click to upload</span>
-                                    <input type="file" name="files" class="drop-zone__input" multiple>
+                                    <input type="file" name="files" id="audio-input" class="drop-zone__input" multiple>
                                   </div>
                                     <input type="hidden" name="directory_folder" value="{{ current_directory.replace(base_directory + '/', '') }}">
-                                    <button class="button button-main" type="submit">
+
+                                    <div class="drop-zone-buttons">
+                                       <button class="button button-main" type="submit">
                                         {% include 'header/icons/icon-add.html' %}
                                         <span style="margin-left: 10px; color: #ffffff;">Завантажити файли</span>
                                      </button>
+
+                                    <button class="button button-secondary" id="open-audio-wave" type="button">
+                                        🎵 Аудіо доріжка
+                                    </button>
+                                   </div>
                                 </form>
                             </div>
-
                         </div>
                     </div>
                 </div>
-                <div class="card ml-15">
+                <div class="card ml-15" style="width: calc(70% - 15px)">
                     <div class="p-20">
                         <span class="card-title">
                             Директорії
@@ -76,11 +82,23 @@
                     </div>
                     <div class="card-border"></div>
                     <div class="card-body">
+                        <div id="audio-wave-container">
+                                {% include 'audioWave.html' %}
+                        </div>
                         <div class="card-body-wrapper">
                             <ul class="file-list">
                                 {% if current_directory != base_directory %}
                                 <li style="height: 55px">
                                     <a href="/datasets/{{ dataset.id }}">.../</a>
+
+                                    <div class="label-filter">
+                                        <select id="label-filter">
+                                            <option value="all">Всі лейбли</option>
+                                            {% for label in labels %}
+                                             <option value="{{ label.id }}">{{ label.name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
                                 </li>
                                  {% endif %}
                                  {% for directory in directories %}
@@ -89,7 +107,7 @@
                                     </li>
                                   {% endfor %}
                                 {% for file in files %}
-                                <li style="height: 55px">
+                                <li style="height: 55px" data-label-id="{{ file.label_id }}">
                                     {% if file.stored %}
                                         <span>{{ file.filename }} <span style="color: green">(Збережено в базі даних)</span></span>
                                     {% else %}
@@ -254,6 +272,13 @@ document.querySelectorAll('.label-select').forEach(selectElement => {
   });
 });
 
+document.getElementById('open-audio-wave')?.addEventListener('click', async () => {
+    const container = document.getElementById('audio-wave-container');
+
+    container.style.display = 'block'
+});
+
+
 function showToast(message) {
     let notifications = document.querySelector(".notifications");
 
@@ -286,6 +311,18 @@ const removeToast = (toast) => {
   if (toast.timeoutId) clearTimeout(toast.timeoutId)
   setTimeout(() => toast.remove(), 500)
 }
+
+document.getElementById('label-filter').addEventListener('change', function () {
+        const selectedLabelId = this.value;
+        const fileItems = document.querySelectorAll('.file-list li[data-label-id]');
+
+        fileItems.forEach(item => {
+            const labelId = item.getAttribute('data-label-id');
+            const matches = selectedLabelId === 'all' || labelId === selectedLabelId;
+            item.style.display = matches ? '' : 'none';
+        });
+    });
+
 </script>
 <div id="audioPlayerContainer"></div>
 </body>

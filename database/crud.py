@@ -3,6 +3,7 @@ from typing import List
 
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
+from sqlalchemy import sql
 from werkzeug.security import generate_password_hash
 
 from database import UserRole, User, Dataset, Train
@@ -275,6 +276,19 @@ def load_labels(db: Session, limit: int, offset: int):
         db.rollback()
         return None
 
+def load_labels_by_name_and_dataset(db: Session, limit: int, offset: int, name: str, dataset_id: int):
+    try:
+        query = db.query(Label)
+        if name and name.strip() != '':
+            query = query.filter(sql.func.lower(Label.name).like(f"%{name.lower()}%"))
+        if dataset_id is not None:
+            query = query.filter(Label.dataset_id == dataset_id)
+        return query.limit(limit).offset(offset).all()
+    except Exception as e:
+        logging.error(f'  >> Error during load query: {e}')
+        db.rollback()
+        return None
+
 
 def load_labels_by_dataset_notation(db: Session, dataset_id: int, notation_id: int):
     try:
@@ -303,7 +317,7 @@ def load_trains(db: Session, limit: int, offset: int):
         return None
 
 
-def count_datasets(db: Session):
+def  count_datasets(db: Session):
     try:
         return db.query(Dataset).count()
     except Exception as e:
@@ -321,11 +335,16 @@ def count_datasets_related_to_user(db: Session, user_id: int):
         return 0
 
 
-def count_labels(db: Session):
+def count_labels(db: Session, name: str, dataset_id: int):
     try:
-        return db.query(Label).count()
+        query = db.query(Label)
+        if name and name.strip() != '':
+            query = query.filter(sql.func.lower(Label.name).like(f"%{name.lower()}%"))
+        if dataset_id is not None:
+            query = query.filter(Label.dataset_id == dataset_id)
+        return query.count()
     except Exception as e:
-        logging.error(f'  >> Error during query: {e}')
+        logging.error(f'  >> Error during count query: {e}')
         db.rollback()
         return 0
 

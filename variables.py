@@ -19,7 +19,7 @@ class Variables:
     )
     mariadb_database_password: str = os.getenv(
         "MARIADB_DATABASE_PASSWORD",
-        "root"
+        "rootroot"
     )
     mariadb_database_host: str = os.getenv(
         "MARIADB_DATABASE_HOST",
@@ -39,7 +39,7 @@ class Variables:
     )
     app_port: int = int(os.getenv(
         "APP_PORT",
-        8001
+        8002
     ))
 
     logger_dir: str = os.getenv(

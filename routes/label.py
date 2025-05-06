@@ -8,7 +8,7 @@ from starlette.responses import HTMLResponse, RedirectResponse
 from starlette.templating import Jinja2Templates
 
 from database.core import Label
-from database.crud import count_datasets, load_labels, load_notations, load_datasets_all, insert_label, \
+from database.crud import count_datasets, load_labels, load_labels_by_name_and_dataset, count_labels, load_notations, load_datasets_all, insert_label, \
     load_label_by_id, load_datasets_all_related_to_user
 from database.database import get_db
 from variables import variables
@@ -23,6 +23,8 @@ async def labels(
         request: Request,
         page: int = Query(1, alias="page"),
         limit: int = Query(10, alias="limit"),
+        name: str = Query('', alias="name"),
+        dataset_id: int = Query(None, alias="dataset_id"),
         db: Session = Depends(get_db)
 ):
     session_user = await get_user(request)
@@ -32,8 +34,8 @@ async def labels(
 
     offset = (page - 1) * limit
 
-    labels = load_labels(db, limit, offset)
-    count = count_datasets(db)
+    labels = load_labels_by_name_and_dataset(db, limit, offset, name, dataset_id)
+    count = count_labels(db, name, dataset_id)
     total_pages = 1 if count <= limit else (count + (limit - 1)) // limit
 
     notations = load_notations(db)
