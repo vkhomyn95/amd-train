@@ -164,7 +164,7 @@ async def start_train(
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
-    logging.info("===Train: %s Using device: %s for train", load_train.name, device)
+    logging.info("===Train: %s Using device: %s for train in starting controller", load_train.name, device)
 
     try:
         target_dir = Path(variables.file_dir) / load_train.name

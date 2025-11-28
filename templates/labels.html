@@ -34,38 +34,25 @@
 
         <div class="content">
             <div class="content-wrapper">
-                <div class="filter-header">
-                    Фільтр
-                </div>
-                <div class="filter">
-                    <div class="filter-item">
-                        <label for="label_name">Назва</label>
-                        <input id="label_name" class="input" type="text" name="name" />
-                    </div>
-                    <div class="filter-item">
-                        <label for="label_dataset">Датасет</label>
-                        <select id="label_dataset" name="dataset_id">
+                <div class="flex flex-direction-row flex-content-between">
+                    <div class="filter">
+                        <div class="filter-item">
+                            <input id="label_name" class="input" type="text" name="name" placeholder="Назва"/>
+                        </div>
+                        <div class="filter-item">
+                            <select id="label_dataset" name="dataset_id">
                                 <option value="" disabled selected>Оберіть датасет</option>
-                              {% for dataset in datasets %}
+                                {% for dataset in datasets %}
                                 <option value="{{ dataset.id }}">{{ dataset.country }}</option>
-                              {% endfor %}
-                        </select>
-                    </div>
-                    <button type="submit" class="button button-primary ml-15" onclick="saveFilter()">
-                        <span style="margin-left: 10px">Фільтрувати</span>
-                    </button>
-                    <button type="button" class="button button-secondary" onclick="resetFilter()">Очистити фільтр</button>
-                </div>
-                <div class="content-wrapper-head">
-                    <div class="content-head-heading">
-                        <div class="content-wrapper-head-header-heading">
-                            Лейбли
+                                {% endfor %}
+                            </select>
                         </div>
-                        <div class="content-wrapper-head-header-description">
-                            Управління
-                        </div>
+                        <button type="submit" class="button button-primary ml-15" onclick="saveFilter()">
+                            <span style="margin-left: 10px">Фільтрувати</span>
+                        </button>
+                        <button type="button" class="button button-secondary" onclick="resetFilter()">Очистити фільтр</button>
                     </div>
-                    <div class="content-wrapper-head-actions">
+                    <div class="content-wrapper-head-actions pr-10">
                         <button class="button button-main" onclick="openModal()">
                             {% include 'header/icons/icon-add.html' %}
                             <span style="margin-left: 10px; color: #ffffff;">Створити</span>

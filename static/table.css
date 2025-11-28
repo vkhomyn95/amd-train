@@ -29,11 +29,10 @@
 }
 
 .content-wrapper-head {
-  height: 90px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 19.232px 23.078px 18.27px 23.078px;
+  padding: 10px;
 }
 
 .content-wrapper-head-header {
@@ -100,7 +99,7 @@
 .content-wrapper-info {
   position: relative;
   overflow-y: scroll;
-  height: calc(100% - (90px + 59px));
+  height: calc(100% - (50px + 59px));
   background: #ffffff;
   margin-right: 10px;
   margin-top: 0;

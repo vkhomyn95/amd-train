@@ -12,7 +12,7 @@ from starlette.templating import Jinja2Templates
 from database import get_db, insert_default_user
 from database.crud import insert_default_roles, insert_default_notation
 from logger.logger import Logger
-from routes import CustomHTTPException, auth, train, user, dataset, label
+from routes import CustomHTTPException, auth, train, user, dataset, label, validation
 from variables import variables
 
 app = FastAPI()
@@ -37,6 +37,8 @@ async def custom_http_exception_handler(request: Request, exc: CustomHTTPExcepti
 app.include_router(auth.router)
 
 app.include_router(train.router, prefix="/trains")
+
+app.include_router(validation.router, prefix="/validation")
 
 app.include_router(dataset.router, prefix="/datasets")
 

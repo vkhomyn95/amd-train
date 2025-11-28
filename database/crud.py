@@ -317,6 +317,14 @@ def load_trains(db: Session, limit: int, offset: int):
         return None
 
 
+def load_trains_all(db: Session):
+    try:
+        return db.query(Train).all()
+    except Exception as e:
+        logging.error(f'  >> Error during query: {e}')
+        db.rollback()
+        return None
+
 def  count_datasets(db: Session):
     try:
         return db.query(Dataset).count()

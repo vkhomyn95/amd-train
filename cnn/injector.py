@@ -50,6 +50,7 @@ def create_csv(db: Session, load_train: Train, preview = True) -> None:
 
     csv_filename = f"dataset_{datetime.datetime.utcnow().strftime('%Y_%m_%d')}.csv"
     csv_filepath = os.path.join(variables.file_dir, load_train.name, csv_filename)
+    logging.info("f Dataset CSV filename is located in directory: %s", str(csv_filepath))
 
     voicemail_iteration_count = len(voicemail) // epochs
     human_iteration_count = len(human) // epochs
@@ -77,7 +78,7 @@ def create_csv(db: Session, load_train: Train, preview = True) -> None:
             try:
                 content = voicemail[voicemail_iteration_position]
                 if not preview:
-                    source_dir = os.path.join(variables.file_dir, countries[content.dataset_id].user_id, countries[content.dataset_id].country, "voicemail")
+                    source_dir = os.path.join(variables.file_dir, str(countries[content.dataset_id].user_id), countries[content.dataset_id].country, "voicemail")
                     fold_dir = os.path.join(variables.file_dir, load_train.name, "audio", f"fold{step}")
                     Path(fold_dir).mkdir(parents=True, exist_ok=True)
 
@@ -94,7 +95,7 @@ def create_csv(db: Session, load_train: Train, preview = True) -> None:
                     labels[content.label_id].name,
                 ])
             except Exception as e:
-                print('Voicemail file exceed reached: %s', str(e))
+                logging.error('Voicemail file exceed reached: %s', str(e))
             voicemail_iteration_position += 1
             voicemail_iteration_count += 1
 
@@ -103,7 +104,7 @@ def create_csv(db: Session, load_train: Train, preview = True) -> None:
             try:
                 content = human[human_iteration_position]
                 if not preview:
-                    source_dir = os.path.join(variables.file_dir, countries[content.dataset_id].user_id, countries[content.dataset_id].country, "human")
+                    source_dir = os.path.join(variables.file_dir, str(countries[content.dataset_id].user_id), countries[content.dataset_id].country, "human")
                     fold_dir = os.path.join(variables.file_dir, load_train.name, "audio", f"fold{step}")
                     Path(fold_dir).mkdir(parents=True, exist_ok=True)
 
@@ -120,37 +121,37 @@ def create_csv(db: Session, load_train: Train, preview = True) -> None:
                     labels[content.label_id].name,
                 ])
             except Exception as e:
-                print('Human file exceed reached: %s', str(e))
+                logging.error('Human file exceed reached: %s', str(e))
 
             human_iteration_position += 1
             human_iteration_count += 1
 
-    for step in range(1, epochs + 1):
-        for file in range(ring_iteration_position, ring_iteration_count):
-            try:
-                content = ring[ring_iteration_position]
-                if not preview:
-                    source_dir = os.path.join(variables.file_dir, countries[content.dataset_id].user_id, countries[content.dataset_id].country, "ring")
-                    fold_dir = os.path.join(variables.file_dir, load_train.name, "audio", f"fold{step}")
-                    Path(fold_dir).mkdir(parents=True, exist_ok=True)
-
-                    shutil.copyfile(
-                        source_dir + "/{}{}".format(content.id, content.extension),
-                        fold_dir + "/{}-{}-2{}".format(step, file + 1, content.extension)
-                    )
-                output_rows.append([
-                    "{}-{}-2{}".format(step, file + 1, content.extension),
-                    step,
-                    2,
-                    "ring",
-                    content.label_id,
-                    labels[content.label_id].name,
-                ])
-            except Exception as e:
-                print('Ring file exceed reached: %s', str(e))
-
-            ring_iteration_position += 1
-            ring_iteration_count += 1
+    # for step in range(1, epochs + 1):
+    #     for file in range(ring_iteration_position, ring_iteration_count):
+    #         try:
+    #             content = ring[ring_iteration_position]
+    #             if not preview:
+    #                 source_dir = os.path.join(variables.file_dir, str(countries[content.dataset_id].user_id), countries[content.dataset_id].country, "ring")
+    #                 fold_dir = os.path.join(variables.file_dir, load_train.name, "audio", f"fold{step}")
+    #                 Path(fold_dir).mkdir(parents=True, exist_ok=True)
+    #
+    #                 shutil.copyfile(
+    #                     source_dir + "/{}{}".format(content.id, content.extension),
+    #                     fold_dir + "/{}-{}-2{}".format(step, file + 1, content.extension)
+    #                 )
+    #             output_rows.append([
+    #                 "{}-{}-2{}".format(step, file + 1, content.extension),
+    #                 step,
+    #                 2,
+    #                 "ring",
+    #                 content.label_id,
+    #                 labels[content.label_id].name,
+    #             ])
+    #         except Exception as e:
+    #             logging.error('Ring file exceed reached: %s', str(e))
+    #
+    #         ring_iteration_position += 1
+    #         ring_iteration_count += 1
 
     out = pd.DataFrame(output_rows, columns=headers)
     out.to_csv(csv_filepath, index=False, quoting=csv.QUOTE_NONNUMERIC)

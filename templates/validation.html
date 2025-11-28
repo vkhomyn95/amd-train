@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+
+{% include 'head.html' %}
+
+{% with messages = get_flashed_messages(request) %}
+{% if messages %}
+{% for message in messages %}
+{% include 'toast.html' %}
+{% endfor %}
+{% endif %}
+{% endwith %}
+
+<body>
+
+{% include 'header/header-top.html' %}
+
+<div class="container">
+
+    {% include 'header/header-left.html' %}
+
+    <div class="container-main">
+        <div class="breadcrumb">
+            <a class="breadcrumb-navigation flex flex-align-center" href="{{ url_for('validation') }}">
+                {% include 'header/icons/icon-breadcrumb.html' %}
+            </a>
+            <div class="breadcrumb-heading flex flex-align-center">
+                <div class="breadcrumb-heading-previous ml-15">
+                    Тестування моделі
+                </div>
+            </div>
+        </div>
+
+<!--        &lt;!&ndash; Flash Messages &ndash;&gt;-->
+<!--        {% for message in get_flashed_messages(request) %}-->
+<!--        <div class="alert alert-{{ message.category }}" style="margin: 15px 0; padding: 12px; border-radius: 4px;-->
+<!--             {% if message.category == 'success' %}background-color: #d4edda; border: 1px solid #c3e6cb; color: #155724;-->
+<!--             {% elif message.category == 'danger' %}background-color: #f8d7da; border: 1px solid #f5c6cb; color: #721c24;-->
+<!--             {% elif message.category == 'warning' %}background-color: #fff3cd; border: 1px solid #ffeaa7; color: #856404;-->
+<!--             {% else %}background-color: #d1ecf1; border: 1px solid #bee5eb; color: #0c5460;{% endif %}">-->
+<!--            {{ message.message }}-->
+<!--        </div>-->
+<!--        {% endfor %}-->
+
+        <div class="content">
+            <div class="mange-wrapper">
+                <!-- Форма налаштувань -->
+                <div class="card" style="width: 30%">
+                    <div class="p-10">
+                        <span class="card-title">
+                            Налаштування
+                        </span>
+                    </div>
+                    <div class="card-border"></div>
+
+                    <div class="card-body">
+                        <div class="card-body-wrapper">
+                            <form
+                                    method="POST"
+                                    id="validationForm"
+                                    action="{{ url_for('check_model') }}"
+                                    enctype="multipart/form-data"
+                            >
+                                <div class="flex flex-direction-row flex-align-center p-10">
+                                    <label for="train_id" class="label label-required_danger">Модель</label>
+                                    <select id="train_id" name="train_id" required>
+                                        <option value="" disabled {% if not selected_train_id %}selected{% endif %}>
+                                            Оберіть модель...
+                                        </option>
+                                        {% for train in trains %}
+                                        <option value="{{ train.id }}"
+                                                {% if selected_train_id == train.id %}selected{% endif %}>
+                                            #{{ train.id }} - {{ train.name }} ({{ train.created_at }})
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <div class="flex flex-direction-row flex-align-center p-10">
+                                    <label for="files" class="label label-required_danger">Аудіофайли</label>
+                                    <input
+                                        class="form-control"
+                                        type="file"
+                                        id="files"
+                                        name="files"
+                                        multiple
+                                        required
+                                        accept="audio/*,.wav,.mp3,.ogg,.flac"
+                                    >
+                                </div>
+
+                                <div class="p-10" style="font-size: 12px; color: #666;">
+                                    <p style="margin: 5px 0;">
+                                        <strong>Підказка:</strong> Можете вибрати декілька файлів одночасно
+                                    </p>
+                                    <p style="margin: 5px 0;">
+                                        Підтримувані формати: WAV, MP3, OGG, FLAC
+                                    </p>
+                                </div>
+
+                                <div class="p-10" id="filePreview" style="display: none;">
+                                    <strong>Вибрано файлів:</strong> <span id="fileCount">0</span>
+                                    <ul id="fileList" style="margin-top: 5px; padding-left: 20px; font-size: 12px; max-height: 150px; overflow-y: auto;">
+                                    </ul>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Результати -->
+                <div class="card ml-15" style="width: calc(70% - 15px)">
+                    <div class="p-10">
+                        <span class="card-title">
+                            Результати валідації
+                        </span>
+                        {% if results %}
+                        <span style="margin-left: 10px; font-size: 14px; color: #666;">
+                            (Всього файлів: {{ results|length }})
+                        </span>
+                        {% endif %}
+                    </div>
+                    <div class="card-border"></div>
+
+                    <div class="card-body">
+                        <div class="card-body-wrapper">
+                            {% if results %}
+                            <div style="overflow-x: auto;">
+                                <table style="width: 100%; border-collapse: collapse;">
+                                    <thead>
+                                        <tr style="background-color: #f8f9fa; border-bottom: 2px solid #dee2e6;">
+                                            <th style="padding: 10px; text-align: left; font-weight: 600;">#</th>
+                                            <th style="padding: 10px; text-align: left; font-weight: 600;">Файл</th>
+                                            <th style="padding: 10px; text-align: center; font-weight: 600;">Клас</th>
+                                            <th style="padding: 10px; text-align: center; font-weight: 600;">Індекс</th>
+                                            <th style="padding: 10px; text-align: center; font-weight: 600;">Впевненість</th>
+                                            <th style="padding: 10px; text-align: center; font-weight: 600;">Статус</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for res in results %}
+                                        <tr style="border-bottom: 1px solid #dee2e6; {% if loop.index % 2 == 0 %}background-color: #f8f9fa;{% endif %}">
+                                            <td style="padding: 10px;">{{ res.index }}</td>
+                                            <td style="padding: 10px; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"
+                                                title="{{ res.filename }}">
+                                                {{ res.filename }}
+                                            </td>
+                                            {% if res.error %}
+                                            <td colspan="4" style="padding: 10px; color: #dc3545; text-align: center;">
+                                                <strong>Помилка:</strong> {{ res.error }}
+                                            </td>
+                                            {% else %}
+                                            <td style="padding: 10px; text-align: center;">
+                                                <span style="padding: 4px 8px; background-color: #007bff; color: white; border-radius: 4px; font-weight: 600;">
+                                                    {{ res.label }}
+                                                </span>
+                                            </td>
+                                            <td style="padding: 10px; text-align: center;">{{ res.class_index }}</td>
+                                            <td style="padding: 10px; text-align: center;">
+                                                <span style="font-weight: 600; color: {% if res.confidence|replace('%','')|float >= 80 %}#28a745{% elif res.confidence|replace('%','')|float >= 60 %}#ffc107{% else %}#dc3545{% endif %}">
+                                                    {{ res.confidence }}
+                                                </span>
+                                            </td>
+                                            <td style="padding: 10px; text-align: center;">
+                                                <span style="color: #28a745; font-weight: 600;">✓ Успішно</span>
+                                            </td>
+                                            {% endif %}
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- Статистика -->
+                            {% set successful = results|selectattr('error', 'none')|list %}
+                            {% if successful %}
+                            <div style="margin-top: 20px; padding: 15px; background-color: #e7f3ff; border-radius: 4px; border-left: 4px solid #007bff;">
+                                <strong>Статистика:</strong>
+                                <ul style="margin: 10px 0 0 20px; padding: 0;">
+                                    <li>Успішно оброблено: {{ successful|length }} з {{ results|length }} файлів</li>
+                                    {% set failed = results|selectattr('error', 'ne', none)|list %}
+                                    {% if failed %}
+                                    <li style="color: #dc3545;">Помилок: {{ failed|length }}</li>
+                                    {% endif %}
+
+                                    {% set class_counts = {} %}
+                                    {% for res in successful %}
+                                        {% set _ = class_counts.update({res.label: class_counts.get(res.label, 0) + 1}) %}
+                                    {% endfor %}
+
+                                    {% if class_counts %}
+                                    <li>Розподіл по класах:
+                                        <ul style="margin: 5px 0 0 20px;">
+                                            {% for class_name, count in class_counts.items() %}
+                                            <li>{{ class_name }}: {{ count }} ({{ (count / successful|length * 100)|round(1) }}%)</li>
+                                            {% endfor %}
+                                        </ul>
+                                    </li>
+                                    {% endif %}
+                                </ul>
+                            </div>
+                            {% endif %}
+
+                            {% else %}
+                            <div style="text-align: center; padding: 40px; color: #999;">
+                                <p style="font-size: 16px; margin-bottom: 10px;">
+                                    Результати з'являться тут після тестування
+                                </p>
+                                <p style="font-size: 14px;">
+                                    Оберіть модель, завантажте аудіофайли та натисніть кнопку "Тестувати"
+                                </p>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <div class="footer-wrapper">
+                <button onclick="saveForm()" class="button button-primary ml-10" id="submitBtn">
+                    <span class="ml-10">Тестувати модель</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Показуємо список вибраних файлів
+        document.getElementById('files').addEventListener('change', function(e) {
+            const filePreview = document.getElementById('filePreview');
+            const fileCount = document.getElementById('fileCount');
+            const fileList = document.getElementById('fileList');
+
+            if (this.files.length > 0) {
+                filePreview.style.display = 'block';
+                fileCount.textContent = this.files.length;
+
+                fileList.innerHTML = '';
+                Array.from(this.files).forEach((file, index) => {
+                    const li = document.createElement('li');
+                    li.textContent = file.name + ' (' + (file.size / 1024).toFixed(1) + ' KB)';
+                    fileList.appendChild(li);
+                });
+            } else {
+                filePreview.style.display = 'none';
+            }
+        });
+
+        function saveForm() {
+            const form = document.getElementById("validationForm");
+            const submitBtn = document.getElementById("submitBtn");
+
+            // Перевіряємо валідність форми
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            // Блокуємо кнопку та показуємо індикатор завантаження
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="ml-10">⏳ Обробка файлів...</span>';
+
+            form.submit();
+        }
+    </script>
+</body>
+</html>
