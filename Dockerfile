@@ -6,7 +6,7 @@ COPY requirements.txt ./
 
 RUN apt-get update && apt-get install -y ffmpeg
 
-RUN python -m pip install -U torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/cu128
+RUN python -m pip install torch==2.3.1 torchvision==0.18.1 torchaudio==2.3.1 --index-url https://download.pytorch.org/whl/cu118
 
 RUN python -m pip install "numpy<2.0"
 
