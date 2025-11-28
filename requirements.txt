@@ -14,3 +14,4 @@ torchsampler
 tensorboard
 arq
 sse-starlette
+torchcodec
