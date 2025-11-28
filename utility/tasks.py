@@ -241,6 +241,8 @@ def train_model_sync(load_train, sample_rate, num_samples, epochs, batch_size, l
 
         logger.info(f"Starting training for {epochs} epochs...")
 
+        torchaudio.set_audio_backend("ffmpeg")
+
         # Тренування
         for epoch in range(epochs):
             logger.info(f"Starting Epoch {epoch + 1}/{epochs}")
