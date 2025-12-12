@@ -126,32 +126,32 @@ def create_csv(db: Session, load_train: Train, preview = True) -> None:
             human_iteration_position += 1
             human_iteration_count += 1
 
-    # for step in range(1, epochs + 1):
-    #     for file in range(ring_iteration_position, ring_iteration_count):
-    #         try:
-    #             content = ring[ring_iteration_position]
-    #             if not preview:
-    #                 source_dir = os.path.join(variables.file_dir, str(countries[content.dataset_id].user_id), countries[content.dataset_id].country, "ring")
-    #                 fold_dir = os.path.join(variables.file_dir, load_train.name, "audio", f"fold{step}")
-    #                 Path(fold_dir).mkdir(parents=True, exist_ok=True)
-    #
-    #                 shutil.copyfile(
-    #                     source_dir + "/{}{}".format(content.id, content.extension),
-    #                     fold_dir + "/{}-{}-2{}".format(step, file + 1, content.extension)
-    #                 )
-    #             output_rows.append([
-    #                 "{}-{}-2{}".format(step, file + 1, content.extension),
-    #                 step,
-    #                 2,
-    #                 "ring",
-    #                 content.label_id,
-    #                 labels[content.label_id].name,
-    #             ])
-    #         except Exception as e:
-    #             logging.error('Ring file exceed reached: %s', str(e))
-    #
-    #         ring_iteration_position += 1
-    #         ring_iteration_count += 1
+    for step in range(1, epochs + 1):
+        for file in range(ring_iteration_position, ring_iteration_count):
+            try:
+                content = ring[ring_iteration_position]
+                if not preview:
+                    source_dir = os.path.join(variables.file_dir, str(countries[content.dataset_id].user_id), countries[content.dataset_id].country, "ring")
+                    fold_dir = os.path.join(variables.file_dir, load_train.name, "audio", f"fold{step}")
+                    Path(fold_dir).mkdir(parents=True, exist_ok=True)
+
+                    shutil.copyfile(
+                        source_dir + "/{}{}".format(content.id, content.extension),
+                        fold_dir + "/{}-{}-2{}".format(step, file + 1, content.extension)
+                    )
+                output_rows.append([
+                    "{}-{}-2{}".format(step, file + 1, content.extension),
+                    step,
+                    2,
+                    "ring",
+                    content.label_id,
+                    labels[content.label_id].name,
+                ])
+            except Exception as e:
+                logging.error('Ring file exceed reached: %s', str(e))
+
+            ring_iteration_position += 1
+            ring_iteration_count += 1
 
     out = pd.DataFrame(output_rows, columns=headers)
     out.to_csv(csv_filepath, index=False, quoting=csv.QUOTE_NONNUMERIC)

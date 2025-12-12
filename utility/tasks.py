@@ -178,6 +178,9 @@ def train_model_sync(load_train, sample_rate, num_samples, epochs, batch_size, l
         # Групуємо по target та category, щоб отримати унікальні комбінації
         unique_classes = df[['target', 'category']].drop_duplicates().sort_values('target')
 
+        num_classes = len(unique_classes)
+        logger.info(f"Detected {num_classes} classes for training.")
+
         # Створюємо маппінг: індекс (target) -> назва класу (category)
         class_mapping = {
             int(row['target']): row['category']
@@ -221,6 +224,7 @@ def train_model_sync(load_train, sample_rate, num_samples, epochs, batch_size, l
 
         # Призначаємо ваги для кожного прикладу
         example_weights = [class_weights_dict[label] for label in labels_target]
+        logger.info(f"Example weights sample: {example_weights[:5]}")
 
         # Створюємо sampler і dataloader
         sampler = WeightedRandomSampler(example_weights, len(labels_target))
@@ -230,9 +234,9 @@ def train_model_sync(load_train, sample_rate, num_samples, epochs, batch_size, l
 
         # Створюємо модель
         logger.info("Initializing model...")
-        cnn = CNNNetwork().to(device)
+        cnn = CNNNetwork(num_classes=num_classes).to(device)
         loss_fn = nn.CrossEntropyLoss()
-        optimiser = torch.optim.Adam(cnn.parameters(), lr=0.000001)
+        optimiser = torch.optim.Adam(cnn.parameters(), lr=0.0001)
 
         # TensorBoard
         tensor_board_log = os.path.join(variables.file_dir, load_train.name, "tensorboard")

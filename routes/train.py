@@ -201,7 +201,7 @@ async def start_train(
     labels_target = usd.annotations["target"]  # Або usd.get_labels(), якщо ви зміните метод get_labels()
 
     labels_unique, counts = np.unique(labels_target, return_counts=True)
-    # Тепер labels_unique буде [0, 1]
+    # Тепер labels_unique буде [0, 1, 2]
 
     logging.info("===Train: {} Unique target labels: {}".format(load_train.name, labels_unique))
 
