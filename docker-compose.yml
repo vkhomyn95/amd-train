@@ -14,6 +14,14 @@ services:
       FILE_DIR: '/stor/data/amd-train/'
       SQLALCHEMY_DATABASE_URI: 'mysql://root:root@127.0.0.1/amd_train'
       USER_DEFAULT_PASSWORD: ''
+      NVIDIA_VISIBLE_DEVICES: all
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [ gpu ]
 
   worker:
     build: .
@@ -23,6 +31,15 @@ services:
     restart: always
     volumes:
       - "/stor:/stor"
+    environment:
+      NVIDIA_VISIBLE_DІндекс	EVICES: all
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [ gpu ]
 
   tensorboard:
     build: .
