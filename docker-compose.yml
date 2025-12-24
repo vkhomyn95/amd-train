@@ -32,7 +32,7 @@ services:
     volumes:
       - "/stor:/stor"
     environment:
-      NVIDIA_VISIBLE_DІндекс	EVICES: all
+      NVIDIA_VISIBLE_DEVICES: all
     deploy:
       resources:
         reservations:
